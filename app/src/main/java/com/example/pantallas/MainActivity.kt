@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import coil.compose.AsyncImage
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.draw.clip
 
 
 class MainActivity : ComponentActivity() {
@@ -44,15 +45,26 @@ class MainActivity : ComponentActivity() {
 }
 
 enum class Screen { Login, Home, ReportCategory, ReportLocation, ReportPhoto, ReportSubmit,
-    ReportSuccess, ReportMap, ReportIAInput, ReportIAProcess, ReportIAResult}
+    ReportSuccess, ReportMap, ReportIAInput, ReportIAProcess, ReportIAResult,  MisReports, MisReportDeleteSuccess, MisReportDetails}
 
 data class ReportState(
     var category: String? = null,
+    var iaFlow: Boolean = false,
     var address: String = "",
     var coords: Pair<Double, Double>? = null,
     var photoUri: Uri? = null,
     var title: String = "",
     var description: String = ""
+)
+
+data class ExistingReport(
+    val id: Int,
+    val title: String,
+    val category: String,
+    val location: String,
+    val time: String,
+    val description: String,
+    val imageRes: Int
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,42 +73,52 @@ fun CiudadActivaApp() {
     var screen by remember { mutableStateOf(Screen.Login) }
     var drawerOpen by remember { mutableStateOf(false) }
     val reportState = remember { ReportState() }
+    val existingReports = remember {
+        mutableStateListOf(
+            ExistingReport(1, "Bache profundo peligroso", "Bache / Daño en vía", "Av. Brasil, Breña", "Hace 1 día",
+                "Descripción detallada...", R.drawable.placeholder),
+            ExistingReport(2, "Basura en parque", "Residuos / Limpieza pública", "Parque Santa Cruz, Lurín", "Hace 6 días",
+                "Descripción detallada...", R.drawable.placeholder),
+            ExistingReport(3, "Poste de luz caído", "Poste dañado", "Parque Arenas, Punta Hermosa", "Hace 2 semanas",
+                "Descripción detallada...", R.drawable.placeholder),
+            ExistingReport(4, "Basura al frente de colegio", "Residuos", "Av Islas Ballestas, Lurín", "Hace 1 mes",
+                "Descripción detallada...", R.drawable.placeholder)
+        )
+    }
+    var selectedExisting by remember { mutableStateOf<ExistingReport?>(null) }
 
     Scaffold(
         topBar = {
+
             when(screen) {
                 Screen.Home         -> HomeTopBar(onMenu = { drawerOpen = true })
                 Screen.ReportCategory -> BackTopBar("Selecciona categoría") { screen = Screen.Home }
                 Screen.ReportIAInput  -> BackTopBar("IA reconoce")       { screen = Screen.ReportCategory }
                 Screen.ReportIAProcess-> BackTopBar("Procesando IA")     { screen = Screen.ReportIAInput }
-                Screen.ReportIAResult -> BackTopBar("Resultado IA")      { screen = Screen.ReportIAProcess }
-                Screen.ReportLocation -> BackTopBar("Selecciona ubicación") { screen = Screen.ReportIAResult }
-                Screen.ReportSubmit   -> BackTopBar("Enviar reporte")    { screen = Screen.ReportLocation }
+                // Screen.ReportIAResult -> BackTopBar("Resultado IA")      { screen = Screen.ReportIAProcess }
+                Screen.ReportIAResult -> BackTopBar("Resultado IA")      { screen = Screen.ReportIAInput }
+                Screen.ReportLocation -> BackTopBar("Selecciona ubicación") { screen = if (reportState.iaFlow) Screen.ReportIAResult else Screen.ReportCategory }
+                Screen.ReportSubmit -> BackTopBar("Enviar reporte") { screen = Screen.ReportPhoto }
                 Screen.ReportSuccess  -> BackTopBar("¡Listo!")           { screen = Screen.Home }
-                Screen.ReportMap      -> BackTopBar("Mapa de reportes")  { screen = Screen.Home; drawerOpen = false }
+                Screen.ReportMap -> HomeTopBar(onMenu = { drawerOpen = true })
+                Screen.ReportPhoto -> BackTopBar("Subir imágenes") { screen = Screen.ReportLocation }
+                Screen.MisReports -> HomeTopBar(onMenu = { drawerOpen = true })
+                Screen.MisReportDetails, Screen.MisReportDeleteSuccess ->
+                BackTopBar(if (screen == Screen.MisReportDetails) "Detalles" else "¡Eliminado!") { screen = Screen.MisReports }
                 else -> {}
             }
+
         },
         content = { padding ->
             Box(Modifier.padding(padding)) {
                 when(screen) {
+
                     Screen.Login -> LoginScreen { screen = Screen.Home }
 
                     Screen.Home -> HomeScreen(
                         onNewReport    = { screen = Screen.ReportCategory },
                         onMenu         = { drawerOpen = true },
                         onDrawerReport = { screen = Screen.ReportCategory }
-                    )
-
-                    Screen.ReportCategory -> CategoryScreen(
-                        onSelect = { cat ->
-                            reportState.category = cat
-                            if (cat == "Detectar con IA") {
-                                screen = Screen.ReportIAInput
-                            } else {
-                                screen = Screen.ReportLocation
-                            }
-                        }
                     )
 
                     Screen.ReportIAProcess -> {
@@ -116,15 +138,6 @@ fun CiudadActivaApp() {
                         onNext   = { screen = Screen.ReportLocation }
                     )
 
-                    Screen.ReportLocation -> LocationScreen(
-                        address = reportState.address,
-                        coords  = reportState.coords
-                    ) { addr, crd ->
-                        reportState.address = addr
-                        reportState.coords = crd
-                        screen = Screen.ReportSubmit
-                    }
-
                     Screen.ReportSubmit -> SubmitScreen(state = reportState) {
                         screen = Screen.ReportSuccess
                     }
@@ -133,9 +146,79 @@ fun CiudadActivaApp() {
                         onDone = { screen = Screen.Home }
                     )
 
-                    Screen.ReportMap -> MapScreen()
+                    Screen.MisReportDeleteSuccess -> Column(
+                        Modifier.fillMaxSize().padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text("¡Su reporte fue eliminado con éxito!", fontSize = 20.sp)
+                        Spacer(Modifier.height(24.dp))
+                        Icon(Icons.Default.CheckCircle, contentDescription = null,
+                            tint = Color(0xFFFFC107), modifier = Modifier.size(100.dp))
+                        Spacer(Modifier.height(24.dp))
+                        Button(onClick = { screen = Screen.MisReports }, shape = RoundedCornerShape(24.dp)) {
+                            Text("Continuar")
+                        }
+                    }
 
-                    Screen.ReportPhoto -> TODO()
+                    Screen.MisReportDetails -> selectedExisting?.let { rpt ->
+                        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+                            Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                                IconButton(onClick = { screen = Screen.MisReports }) {
+                                    Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
+                                }
+                            }
+                            AsyncImage(model = rpt.imageRes, contentDescription = null,
+                                modifier = Modifier.fillMaxWidth().height(200.dp), contentScale = ContentScale.Crop)
+                            Spacer(Modifier.height(16.dp))
+                            Text(rpt.title, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.padding(horizontal = 16.dp))
+                            Divider(Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                            Text("Descripción:", fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 16.dp))
+                            Text(rpt.description, modifier = Modifier.padding(16.dp))
+                            Text("Categoría: ${rpt.category}", modifier = Modifier.padding(horizontal = 16.dp))
+                        }
+                    }
+
+                    Screen.ReportCategory -> CategoryScreen { cat ->
+                        reportState.category = cat
+                        reportState.iaFlow = (cat == "Detectar con IA")
+                        screen = if (reportState.iaFlow) Screen.ReportIAInput else Screen.ReportLocation
+                    }
+
+                    Screen.ReportLocation -> LocationScreen(
+                        address = reportState.address,
+                        coords  = reportState.coords
+                    ) { addr, crd ->
+                        reportState.address = addr
+                        reportState.coords = crd
+                        screen = if (reportState.iaFlow) Screen.ReportSubmit else Screen.ReportPhoto
+                    }
+
+                    Screen.ReportPhoto -> PhotoScreen { uri ->
+                        reportState.photoUri = uri
+                        screen = Screen.ReportSubmit
+                    }
+
+                    Screen.MisReports -> MisReportsScreen(
+                        reports  = existingReports,
+                        onDelete = { rpt ->
+                            existingReports.remove(rpt)
+                            screen = Screen.MisReportDeleteSuccess
+                        },
+                        onDetails = { rpt ->
+                            selectedExisting = rpt
+                            screen = Screen.MisReportDetails
+                        }
+                    )
+
+                    Screen.ReportMap -> {
+                        Image(
+                            painter = painterResource(R.drawable.maps),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
             }
         }
@@ -143,11 +226,83 @@ fun CiudadActivaApp() {
 
     if (drawerOpen) {
         AppDrawer(
-            onClose  = { drawerOpen = false },
-            onLogout = { screen = Screen.Login; drawerOpen = false },
-            onReport = { screen = Screen.ReportCategory; drawerOpen = false },
-            onMap    = { screen = Screen.ReportMap; drawerOpen = false }
+            onClose      = { drawerOpen = false },
+            onLogout     = { screen = Screen.Login; drawerOpen = false },
+            onReport     = { screen = Screen.ReportCategory; drawerOpen = false },
+            onMap        = { screen = Screen.ReportMap; drawerOpen = false },
+            onMisReports = { screen = Screen.MisReports; drawerOpen = false }
         )
+    }
+}
+
+@Composable
+fun MisReportsScreen(
+    reports: List<ExistingReport>,
+    onDelete: (ExistingReport) -> Unit,
+    onDetails: (ExistingReport) -> Unit
+) {
+    var expandedIndex by remember { mutableStateOf<Int?>(null) }
+    LazyColumn {
+        reports.forEachIndexed { idx, rpt ->
+            item {
+                Card(
+                    Modifier.fillMaxWidth().padding(8.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = cardElevation(defaultElevation = 4.dp)
+                ) {
+                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(rpt.title, fontWeight = FontWeight.Bold)
+                            Spacer(Modifier.height(4.dp))
+                            Text(rpt.category, style = MaterialTheme.typography.bodyMedium)
+                            Spacer(Modifier.height(4.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Spacer(Modifier.width(4.dp))
+                                Text(rpt.location, style = MaterialTheme.typography.labelSmall)
+                            }
+                            Text(rpt.time, style = MaterialTheme.typography.labelSmall)
+                        }
+                        AsyncImage(model = rpt.imageRes, contentDescription = null,
+                            modifier = Modifier.size(60.dp).clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop)
+                        Box {
+                            IconButton(onClick = { expandedIndex = if (expandedIndex == idx) null else idx }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = "Opciones")
+                            }
+                            DropdownMenu(
+                                expanded = (expandedIndex == idx),
+                                onDismissRequest = { expandedIndex = null }
+                            ) {
+                                DropdownMenuItem(text = { Text("Eliminar") }, onClick = { onDelete(rpt); expandedIndex = null })
+                                DropdownMenuItem(text = { Text("Detalles") }, onClick = { onDetails(rpt); expandedIndex = null })
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AppDrawer(onClose: () -> Unit, onLogout: () -> Unit, onReport: () -> Unit, onMap: () -> Unit, onMisReports: () -> Unit) {
+    Box(Modifier.fillMaxSize().background(Color(0x88000000)).clickable { onClose() }) {
+        Column(Modifier.width(280.dp).fillMaxHeight().background(Color.White)) {
+            Box(Modifier.fillMaxWidth().background(Color(0xFF8A4F2A), RoundedCornerShape(bottomEnd = 40.dp)).padding(16.dp)) {
+                Column {
+                    Icon(Icons.Default.AccountCircle, contentDescription = null, tint = Color.White, modifier = Modifier.size(48.dp))
+                    Text("Carlos Augusto M.", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text("Vecino", color = Color.White)
+                }
+            }
+            Spacer(Modifier.height(24.dp))
+            DrawerItem("Reportar incidencia", Icons.Default.ChatBubble) { onReport() }
+            DrawerItem("Mis reportes", Icons.Default.List) { onMisReports() }
+            DrawerItem("Ver mapa de reportes", Icons.Default.Map) { onMap() }
+            Spacer(Modifier.weight(1f))
+            DrawerItem("Cerrar sesión", Icons.Default.ExitToApp) { onLogout() }
+        }
     }
 }
 
@@ -455,31 +610,6 @@ fun SubmitScreen(state: ReportState, onSubmit: () -> Unit) {
         Spacer(Modifier.height(24.dp))
         Button(onClick = onSubmit, Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF7EBD9))) {
             Text("Enviar")
-        }
-    }
-}
-
-
-
-@Composable
-fun AppDrawer(onClose: () -> Unit, onLogout: () -> Unit, onReport: () -> Unit, onMap: () -> Unit) {
-    Box(Modifier.fillMaxSize().background(Color(0x88000000)).clickable { onClose() }) {
-        Column(Modifier.width(280.dp).fillMaxHeight().background(Color.White)) {
-            // cabecera perfil
-            Box(Modifier.fillMaxWidth().background(Color(0xFF8A4F2A), RoundedCornerShape(bottomEnd = 40.dp)).padding(16.dp)) {
-                Column {
-                    Icon(Icons.Default.AccountCircle, contentDescription = null, tint = Color.White, modifier = Modifier.size(48.dp))
-                    Text("Carlos Augusto M.", color = Color.White, fontWeight = FontWeight.Bold)
-                    Text("Vecino", color = Color.White)
-                }
-            }
-            Spacer(Modifier.height(24.dp))
-            // opciones
-            DrawerItem("Reportar incidencia", Icons.Default.ChatBubble) { onReport() }
-            DrawerItem("Mis reportes", Icons.Default.List) { /* aqui falta los reportes */ }
-            DrawerItem("Ver mapa de reportes", Icons.Default.Map) { onMap() }
-            Spacer(Modifier.weight(1f))
-            DrawerItem("Cerrar sesión", Icons.Default.ExitToApp) { onLogout() }
         }
     }
 }
