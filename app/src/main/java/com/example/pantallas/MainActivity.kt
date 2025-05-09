@@ -44,8 +44,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-enum class Screen { Login, Home, ReportCategory, ReportLocation, ReportPhoto, ReportSubmit,
-    ReportSuccess, ReportMap, ReportIAInput, ReportIAProcess, ReportIAResult,  MisReports, MisReportDeleteSuccess, MisReportDetails}
+enum class Screen {
+    Login, Register, Home,
+    ReportCategory, ReportLocation, ReportPhoto, ReportSubmit,
+    ReportSuccess, ReportMap,
+    ReportIAInput, ReportIAProcess, ReportIAResult,
+    MisReports, MisReportDeleteSuccess, MisReportDetails
+}
 
 data class ReportState(
     var category: String? = null,
@@ -91,7 +96,9 @@ fun CiudadActivaApp() {
         topBar = {
 
             when(screen) {
-                Screen.Home         -> HomeTopBar(onMenu = { drawerOpen = true })
+                Screen.Login    -> { /* sin topBar */ }
+                Screen.Register -> BackTopBar("Registro")     { screen = Screen.Login }
+                Screen.Home     -> HomeTopBar(onMenu = { drawerOpen = true })
                 Screen.ReportCategory -> BackTopBar("Selecciona categoría") { screen = Screen.Home }
                 Screen.ReportIAInput  -> BackTopBar("IA reconoce")       { screen = Screen.ReportCategory }
                 Screen.ReportIAProcess-> BackTopBar("Procesando IA")     { screen = Screen.ReportIAInput }
@@ -113,7 +120,13 @@ fun CiudadActivaApp() {
             Box(Modifier.padding(padding)) {
                 when(screen) {
 
-                    Screen.Login -> LoginScreen { screen = Screen.Home }
+                    Screen.Login -> LoginScreen(
+                        onLogin    = { screen = Screen.Home },
+                        onRegister = { screen = Screen.Register }
+                    )
+                    Screen.Register -> RegisterScreen { screen = Screen.Login }
+
+                    // Screen.Login -> LoginScreen { screen = Screen.Home }
 
                     Screen.Home -> HomeScreen(
                         onNewReport    = { screen = Screen.ReportCategory },
@@ -230,7 +243,8 @@ fun CiudadActivaApp() {
             onLogout     = { screen = Screen.Login; drawerOpen = false },
             onReport     = { screen = Screen.ReportCategory; drawerOpen = false },
             onMap        = { screen = Screen.ReportMap; drawerOpen = false },
-            onMisReports = { screen = Screen.MisReports; drawerOpen = false }
+            onMisReports = { screen = Screen.MisReports; drawerOpen = false },
+            onHome      = { screen = Screen.Home; drawerOpen = false }
         )
     }
 }
@@ -286,7 +300,12 @@ fun MisReportsScreen(
 }
 
 @Composable
-fun AppDrawer(onClose: () -> Unit, onLogout: () -> Unit, onReport: () -> Unit, onMap: () -> Unit, onMisReports: () -> Unit) {
+fun AppDrawer(onClose: () -> Unit,
+              onHome: () -> Unit,
+              onLogout: () -> Unit,
+              onReport: () -> Unit,
+              onMap: () -> Unit,
+              onMisReports: () -> Unit) {
     Box(Modifier.fillMaxSize().background(Color(0x88000000)).clickable { onClose() }) {
         Column(Modifier.width(280.dp).fillMaxHeight().background(Color.White)) {
             Box(Modifier.fillMaxWidth().background(Color(0xFF8A4F2A), RoundedCornerShape(bottomEnd = 40.dp)).padding(16.dp)) {
@@ -297,6 +316,7 @@ fun AppDrawer(onClose: () -> Unit, onLogout: () -> Unit, onReport: () -> Unit, o
                 }
             }
             Spacer(Modifier.height(24.dp))
+            DrawerItem("Inicio", Icons.Default.Home)       { onHome() }
             DrawerItem("Reportar incidencia", Icons.Default.ChatBubble) { onReport() }
             DrawerItem("Mis reportes", Icons.Default.List) { onMisReports() }
             DrawerItem("Ver mapa de reportes", Icons.Default.Map) { onMap() }
@@ -335,7 +355,7 @@ fun BackTopBar(title: String, onBack: () -> Unit) {
 }
 
 @Composable
-fun LoginScreen(onLogin: () -> Unit) {
+fun LoginScreen(onLogin: () -> Unit, onRegister: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
@@ -384,11 +404,15 @@ fun LoginScreen(onLogin: () -> Unit) {
                 Spacer(Modifier.height(16.dp))
                 Button(
                     onClick = { if (email.isNotBlank() && password.isNotBlank()) onLogin() else showError = true },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF7EBD9))
                 ) {
                     Text("Iniciar sesión", color = Color.Black)
+                }
+                Spacer(Modifier.height(8.dp))
+                TextButton(onClick = onRegister) {
+                    Text("¿No tienes cuenta? Regístrate", color = MaterialTheme.colorScheme.primary)
                 }
             }
         }
@@ -460,6 +484,53 @@ fun HomeScreen(onNewReport: () -> Unit, onMenu: () -> Unit, onDrawerReport: () -
     }
 }
 
+@Composable
+fun RegisterScreen(onRegistered: () -> Unit) {
+    var nombres   by remember { mutableStateOf("") }
+    var apellidos by remember { mutableStateOf("") }
+    var dni       by remember { mutableStateOf("") }
+    var pais      by remember { mutableStateOf("") }
+    var ciudad    by remember { mutableStateOf("") }
+    var distrito  by remember { mutableStateOf("") }
+    var email     by remember { mutableStateOf("") }
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Registro de usuario", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(16.dp))
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(nombres,   { nombres = it   }, label = { Text("Nombres") },   modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(apellidos, { apellidos = it }, label = { Text("Apellidos") }, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(dni,       { dni = it       }, label = { Text("DNI") },       modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(pais,      { pais = it      }, label = { Text("País") },      modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(ciudad,    { ciudad = it    }, label = { Text("Ciudad") },    modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(distrito,  { distrito = it  }, label = { Text("Distrito") },  modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(email,     { email = it     }, label = { Text("Email") },     modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Button(
+            onClick = onRegistered,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8BC34A))
+        ) {
+            Text("Registrar", color = Color.White)
+        }
+    }
+}
 
 @Composable
 fun CategoryScreen(onSelect: (String) -> Unit) {
