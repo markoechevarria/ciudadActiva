@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1071581429709",
+    "project_id": "maps2-932c9",
+    "storage_bucket": "maps2-932c9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1071581429709:android:7de49b821bf0c197670e84",
+        "android_client_info": {
+          "package_name": "com.example.pantallas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEyIvtBkqDIMcNdmthe7Xn6Y82LaeUyGw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

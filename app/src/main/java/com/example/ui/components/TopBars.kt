@@ -16,7 +16,7 @@ fun HomeTopBar(onMenu: () -> Unit) {
     TopAppBar(
         title = { 
             Text(
-                "¡Bienvenido a Ciudad Activa!",
+                "Home",
                 color = TextPrimary
             ) 
         },

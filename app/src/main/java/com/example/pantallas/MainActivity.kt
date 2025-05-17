@@ -1,4 +1,4 @@
-package com.example
+package com.example.pantallas
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
