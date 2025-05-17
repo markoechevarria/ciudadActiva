@@ -14,6 +14,7 @@ import com.example.ui.screens.auth.LoginScreen
 import com.example.ui.screens.auth.RegisterScreen
 import com.example.ui.screens.home.HomeScreen
 import com.example.ui.screens.report.ReportCategoryScreen
+import com.example.ui.screens.misreports.MisReportesScreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,6 +82,7 @@ fun AppNavigation() {
                             onBack = { screen = Screen.Home },
                             onCategorySelected = { /* Aquí puedes navegar a la siguiente pantalla según la categoría */ }
                         )
+                        Screen.MisReports -> MisReportesScreen()
                         // Aquí irán las demás pantallas
                         else -> {}
                     }
