@@ -45,8 +45,8 @@ fun AppNavigation() {
                 when(screen) {
                     Screen.Login    -> { /* no le pongan nada aun */ }
                     Screen.Register -> BackTopBar("Registro")     { screen = Screen.Login }
-                    Screen.Home     -> HomeTopBar(onMenu = { scope.launch { drawerState.open() } })
-                    Screen.ReportCategory -> BackTopBar("Selecciona categoría") { screen = Screen.Home }
+                    Screen.Home     -> HomeTopBar(title = "Home", onMenu = { scope.launch { drawerState.open() } })
+                    Screen.ReportCategory -> BackTopBar("Nuevo Reporte") { screen = Screen.Home }
                     Screen.ReportIAInput  -> BackTopBar("IA reconoce")       { screen = Screen.ReportCategory }
                     Screen.ReportIAProcess-> BackTopBar("Procesando IA")     { screen = Screen.ReportIAInput }
                     Screen.ReportIAResult -> BackTopBar("Resultado IA")      { screen = Screen.ReportIAInput }
@@ -55,9 +55,9 @@ fun AppNavigation() {
                     }
                     Screen.ReportSubmit -> BackTopBar("Enviar reporte") { screen = Screen.ReportPhoto }
                     Screen.ReportSuccess  -> BackTopBar("¡Listo!")           { screen = Screen.Home }
-                    Screen.ReportMap -> HomeTopBar(onMenu = { scope.launch { drawerState.open() } })
+                    Screen.ReportMap -> HomeTopBar(title = "Mapa", onMenu = { scope.launch { drawerState.open() } })
                     Screen.ReportPhoto -> BackTopBar("Subir imágenes") { screen = Screen.ReportLocation }
-                    Screen.MisReports -> HomeTopBar(onMenu = { scope.launch { drawerState.open() } })
+                    Screen.MisReports -> HomeTopBar(title = "Mis Reportes", onMenu = { scope.launch { drawerState.open() } })
                     Screen.MisReportDetails, Screen.MisReportDeleteSuccess ->
                         BackTopBar(
                             if (screen == Screen.MisReportDetails) "Detalles" else "¡Eliminado!"

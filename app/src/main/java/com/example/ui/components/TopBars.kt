@@ -12,11 +12,11 @@ import com.example.ui.theme.TextPrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar(onMenu: () -> Unit) {
+fun HomeTopBar(title: String, onMenu: () -> Unit) {
     TopAppBar(
         title = { 
             Text(
-                "Home",
+                title,
                 color = TextPrimary
             ) 
         },
