@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.pantallas"
+    namespace = "com.example.ciudadactiva"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.pantallas"
+        applicationId = "com.example.ciudadactiva"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -86,6 +86,9 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
+    implementation("androidx.navigation:navigation-compose:2.8.5")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

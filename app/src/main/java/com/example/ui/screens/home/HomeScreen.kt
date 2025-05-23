@@ -1,6 +1,6 @@
 package com.example.ui.screens.home
 
-import com.example.pantallas.R
+import com.example.ciudadactiva.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
