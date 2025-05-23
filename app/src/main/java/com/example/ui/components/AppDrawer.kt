@@ -1,18 +1,14 @@
 package com.example.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.example.ui.theme.Primary
 import com.example.ui.theme.SurfaceLight
 import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
@@ -29,10 +25,10 @@ fun AppDrawer(
     ModalDrawerSheet(
         drawerContainerColor = SurfaceLight
     ) {
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
         Text(
             "Menú",
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.headlineSmall,
             color = TextPrimary
         )
@@ -78,23 +74,20 @@ private fun DrawerItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        color = Color.Transparent
+        color = androidx.compose.ui.graphics.Color.Transparent
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Icon(
                 icon,
                 contentDescription = null,
-                tint = Primary,
-                modifier = Modifier.size(24.dp)
+                tint = TextPrimary
             )
             Text(
                 label,
-                color = TextPrimary,
-                style = MaterialTheme.typography.bodyLarge
+                color = TextPrimary
             )
         }
     }
