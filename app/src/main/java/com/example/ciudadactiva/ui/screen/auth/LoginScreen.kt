@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ciudadactiva.R
+import com.example.ciudadactiva.viewmodel.AuthViewModel
 
 @Composable
 fun LoginScreen(
@@ -24,9 +25,16 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onRegisterClick: () -> Unit
 ) {
+/**
     val email by authViewModel::loginEmail
     val password by authViewModel::loginPassword
     val error by authViewModel::loginError
+**/
+
+    val email = authViewModel.loginEmail
+    val password = authViewModel.loginPassword
+    val error = authViewModel.loginError
+
 
     Column(
         Modifier
@@ -67,6 +75,7 @@ fun LoginScreen(
                     isError = error != null,
                     modifier = Modifier.fillMaxWidth()
                 )
+
                 error?.let {
                     Text(it, color = Color.Red, modifier = Modifier.padding(top = 8.dp))
                 }

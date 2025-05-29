@@ -32,7 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ciudadactiva.R
-import com.example.ciudadactiva.ui.screen.report.ReportViewModel
+import com.example.ciudadactiva.viewmodel.ReportViewModel
 
 @Composable
 fun CategoryScreen(

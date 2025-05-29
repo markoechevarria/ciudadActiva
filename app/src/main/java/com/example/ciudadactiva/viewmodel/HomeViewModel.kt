@@ -1,8 +1,9 @@
-package com.example.ciudadactiva.ui.screen.home
+package com.example.ciudadactiva.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ciudadactiva.data.model.ExistingReport
+import com.example.ciudadactiva.data.model.ReportState
 import com.example.ciudadactiva.data.repository.InMemoryReportRepository
 import com.example.ciudadactiva.data.repository.ReportRepository
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,7 +16,7 @@ class HomeViewModel(
 
     val reports: StateFlow<List<ExistingReport>> = repository
         .observeReports()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+        .stateIn(viewModelScope, SharingStarted.Companion.WhileSubscribed(5000), emptyList())
 
     suspend fun deleteReport(id: Int) {
         repository.deleteReport(id)
@@ -24,7 +25,7 @@ class HomeViewModel(
     // Para agregar directamente un reporte desde algún test o acción rápida
     suspend fun addDummyReport() {
         repository.addReport(
-            com.example.ciudadactiva.data.model.ReportState(
+            ReportState(
                 title = "Fuga de agua",
                 category = "Servicios",
                 address = "Av. Central 123",

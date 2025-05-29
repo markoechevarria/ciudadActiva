@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
-import com.example.navigation.AppNavigation
+import com.example.ciudadactiva.ui.navigation.AppNavigation
 import com.example.ciudadactiva.ui.theme.CiudadActivaTheme
 
 class MainActivity : ComponentActivity() {

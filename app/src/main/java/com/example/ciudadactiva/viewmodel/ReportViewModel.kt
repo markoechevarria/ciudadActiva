@@ -1,9 +1,7 @@
-package com.example.ciudadactiva.ui.screen.report
+package com.example.ciudadactiva.viewmodel
 
 import android.net.Uri
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.ciudadactiva.data.model.ReportState
 import com.example.ciudadactiva.data.repository.ReportRepository
@@ -76,13 +74,13 @@ class ReportViewModel(
     fun submit(onSuccess: () -> Unit) {
         // Construye el estado
         val state = ReportState(
-            category   = category,
-            iaFlow     = iaFlow,
-            photoUri   = photoUri,
-            address    = address,
-            coords     = coords,
-            title      = title,
-            description= description
+            category = category,
+            iaFlow = iaFlow,
+            photoUri = photoUri,
+            address = address,
+            coords = coords,
+            title = title,
+            description = description
         )
         CoroutineScope(Dispatchers.IO).launch {
             repository.addReport(state)

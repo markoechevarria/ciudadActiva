@@ -44,8 +44,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ciudadactiva.R
 import com.example.ciudadactiva.data.model.ExistingReport
-import com.example.ciudadactiva.ui.screen.home.HomeViewModel
 import com.example.ciudadactiva.ui.theme.Primary
+import com.example.ciudadactiva.viewmodel.HomeViewModel
 import kotlinx.coroutines.launch
 
 @Composable

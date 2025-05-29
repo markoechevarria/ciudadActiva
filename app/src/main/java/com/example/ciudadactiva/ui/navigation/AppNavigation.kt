@@ -1,16 +1,13 @@
 package com.example.ciudadactiva.ui.navigation
 
-
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.ciudadactiva.ui.screen.auth.AuthViewModel
 import com.example.ciudadactiva.ui.screen.auth.LoginScreen
 import com.example.ciudadactiva.ui.screen.auth.RegisterScreen
 import com.example.ciudadactiva.ui.screen.home.HomeScreen
-import com.example.ciudadactiva.ui.screen.report.ReportViewModel
 import com.example.ciudadactiva.ui.screens.home.MisReportsScreen
 import com.example.ciudadactiva.ui.screens.report.CategoryScreen
 import com.example.ciudadactiva.ui.screens.report.IAResultScreen
@@ -18,9 +15,11 @@ import com.example.ciudadactiva.ui.screens.report.LocationScreen
 import com.example.ciudadactiva.ui.screens.report.PhotoScreen
 import com.example.ciudadactiva.ui.screens.report.SubmitScreen
 import com.example.ciudadactiva.ui.screens.report.SuccessScreen
+import com.example.ciudadactiva.viewmodel.AuthViewModel
+import com.example.ciudadactiva.viewmodel.ReportViewModel
 
 @Composable
-fun AppNavGraph() {
+fun AppNavigation() {
     val navController = rememberNavController()
     NavHost(navController, startDestination = "login") {
 

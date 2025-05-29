@@ -1,8 +1,6 @@
-package com.example.ciudadactiva.ui.screen.auth
+package com.example.ciudadactiva.viewmodel
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
 class AuthViewModel : ViewModel() {
