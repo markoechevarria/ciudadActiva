@@ -1,7 +1,9 @@
 package com.example.ciudadactiva.viewmodel
 
 import android.net.Uri
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.ciudadactiva.data.model.ReportState
 import com.example.ciudadactiva.data.repository.ReportRepository

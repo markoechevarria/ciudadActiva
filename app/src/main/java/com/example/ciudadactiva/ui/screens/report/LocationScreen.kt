@@ -2,16 +2,13 @@ package com.example.ciudadactiva.ui.screens.report
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ciudadactiva.R
-import androidx.compose.material3.*
 import com.example.ciudadactiva.viewmodel.ReportViewModel
 
 @Composable
@@ -19,7 +16,7 @@ fun LocationScreen(
     viewModel: ReportViewModel = viewModel(),
     onNext: () -> Unit
 ) {
-    var localAddress by remember { mutableStateOf(viewModel.address) }
+    var localAddress: String by remember { mutableStateOf(viewModel.address) }
     Column(Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(R.drawable.mapa_google),

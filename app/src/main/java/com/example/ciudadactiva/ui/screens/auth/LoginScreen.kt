@@ -1,107 +1,109 @@
 package com.example.ciudadactiva.ui.screens.auth
 
-import com.example.ciudadactiva.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults.cardElevation
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.ciudadactiva.ui.components.PrimaryTextField
-import com.example.ciudadactiva.ui.components.TextButton
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ciudadactiva.R
+import com.example.ciudadactiva.viewmodel.AuthViewModel
 
 @Composable
 fun LoginScreen(
-    onLogin: () -> Unit,
-    onRegister: () -> Unit
+    authViewModel: AuthViewModel = viewModel(),
+    onLoginSuccess: () -> Unit,
+    onRegisterClick: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    /**
+    val email by authViewModel::loginEmail
+    val password by authViewModel::loginPassword
+    val error by authViewModel::loginError
+    **/
+
+    val email = authViewModel.loginEmail
+    val password = authViewModel.loginPassword
+    val error = authViewModel.loginError
 
     Column(
-        modifier = Modifier
+        Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5)), // Fondo general claro
+            .background(Color(0xFFF5F5F5)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Imagen superior (logo + ciudad)
         Image(
-            painter = painterResource(id = R.drawable.ciudad),
-            contentDescription = "Logo Ciudad Activa",
+            painter = painterResource(R.drawable.ciudad),
+            contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(260.dp)
+                .height(280.dp),
+            contentScale = ContentScale.Crop
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Card con formulario
+        Spacer(Modifier.height(16.dp))
         Card(
-            modifier = Modifier
-                .fillMaxWidth(0.90f)
-                .offset(y = (-60).dp), // Usar offset en vez de padding negativo
-            shape = RoundedCornerShape(28.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            Modifier.fillMaxWidth().padding(16.dp),
+            elevation = cardElevation(defaultElevation = 8.dp),
+            shape = RoundedCornerShape(24.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp, vertical = 32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "¡Bienvenido a Ciudad Activa!",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.Black
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                PrimaryTextField(
+            Column(Modifier.padding(24.dp)) {
+                Text("¡Bienvenido a Ciudad Activa!", fontSize = 18.sp, color = Color.Black)
+                Spacer(Modifier.height(16.dp))
+
+                OutlinedTextField(
                     value = email,
-                    onValueChange = { email = it },
-                    label = "Correo"
+                    onValueChange = authViewModel::onLoginEmailChange,
+                    label = { Text("Correo") },
+                    isError = error != null,
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(12.dp))
-                PrimaryTextField(
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
                     value = password,
-                    onValueChange = { password = it },
-                    label = "Contraseña"
+                    onValueChange = authViewModel::onLoginPasswordChange,
+                    label = { Text("Contraseña") },
+                    isError = error != null,
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(24.dp))
+                error?.let {
+                    Text(it, color = Color.Red, modifier = Modifier.padding(top = 8.dp))
+                }
+
+                Spacer(Modifier.height(16.dp))
                 Button(
-                    onClick = onLogin,
-                    modifier = Modifier
+                    onClick = { authViewModel.login(onLoginSuccess) },
+                    Modifier
                         .fillMaxWidth()
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFFF3E0), // Color similar al de la imagen
-                        contentColor = Color.Black
-                    ),
-                    shape = RoundedCornerShape(16.dp)
+                        .padding(horizontal = 16.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF7EBD9))
                 ) {
-                    Text("Iniciar sesión")
+                    Text("Iniciar sesión", color = Color.Black)
+                }
+                Spacer(Modifier.height(8.dp))
+                TextButton(onClick = onRegisterClick) {
+                    Text("¿No tienes cuenta? Regístrate", color = MaterialTheme.colorScheme.primary)
                 }
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Botón de registro y aclaraciones
-        TextButton(
-            text = "¿No tienes cuenta? Regístrate",
-            onClick = onRegister
-        )
-        Text(
-            text = "Al iniciar sesión aceptas los Términos y Condiciones y la Política de Privacidad.",
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray,
-            modifier = Modifier
-                .padding(horizontal = 32.dp, vertical = 8.dp),
-            textAlign = TextAlign.Center
-        )
     }
-} 
+}

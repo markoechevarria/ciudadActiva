@@ -5,9 +5,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.ciudadactiva.ui.screen.auth.LoginScreen
-import com.example.ciudadactiva.ui.screen.auth.RegisterScreen
-import com.example.ciudadactiva.ui.screen.home.HomeScreen
+import com.example.ciudadactiva.ui.screens.auth.LoginScreen
+import com.example.ciudadactiva.ui.screens.auth.RegisterScreen
+import com.example.ciudadactiva.ui.screens.home.HomeScreen
 import com.example.ciudadactiva.ui.screens.home.MisReportsScreen
 import com.example.ciudadactiva.ui.screens.report.CategoryScreen
 import com.example.ciudadactiva.ui.screens.report.IAResultScreen
@@ -42,11 +42,15 @@ fun AppNavigation() {
         }
 
         // — Home —
+
         composable("home") {
             HomeScreen(
-                onDrawerClick = { /* abrir tu Drawer */ }
+                onNewReport = { navController.navigate("category") },
+                onMenu = { /* abrir menú lateral */ },
+                onDrawerReport = { navController.navigate("my_reports") }
             )
         }
+
         composable("home/misreports") {
             MisReportsScreen(viewModel())
         }

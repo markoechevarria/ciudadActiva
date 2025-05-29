@@ -33,7 +33,10 @@ fun SubmitScreen(
         Text("Nuevo Reporte", style = MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.height(16.dp))
         viewModel.photoUri?.let { uri ->
-            AsyncImage(model = uri, contentDescription = null, modifier = Modifier.fillMaxWidth().height(200.dp))
+            AsyncImage(
+                model = uri,
+                contentDescription = null,
+                modifier = Modifier.fillMaxWidth().height(200.dp))
         }
         Spacer(Modifier.height(16.dp))
         OutlinedTextField(
